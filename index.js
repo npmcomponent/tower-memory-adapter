@@ -6,6 +6,7 @@
 var adapter = require('tower-adapter')
   , container = require('tower-container')
   , model = require('tower-model')
+  , operators = require('tower-operator')
   , strcase = require('tower-strcase')
   // XXX: strip out pluralize/singularize into single
   //      function components.
@@ -53,17 +54,6 @@ MemoryAdapter.prototype.insert = function(criteria, fn){
   fn(null, this.recordsByType[0] = criteria.pop()[2]);
 }
 
-var operations = {};
-
-// XXX: tower-operator module
-operations['string.eq'] = function(a, b){
-  return a === b;
-}
-
-function operation(type, operator, a, b){
-  return operations[type + '.' + operator](a, b);
-}
-
 MemoryAdapter.prototype.query = function(criteria, fn){
   var type = criteria[0][1]
     , collection = this.recordsByType[type]
@@ -80,7 +70,7 @@ MemoryAdapter.prototype.query = function(criteria, fn){
       // XXX: need to get field type from schema.
       var attrType = attrs[condition[2]].type;
       // XXX: this isn't correct yet, only accounts for one condition.
-      if (operation(attrType, condition[1], record[condition[2]], condition[3]))
+      if (operators[attrType + '.' + condition[1]](record[condition[2]], condition[3]))
         result.push(record);
     }
   }

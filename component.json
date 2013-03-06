@@ -14,7 +14,8 @@
     "tower-container": "*",
     "tower-model": "*",
     "tower-strcase": "*",
-    "tower-adapter": "*"
+    "tower-adapter": "*",
+    "tower-operator": "*"
   },
   "scripts": ["index.js"],
   "license": "MIT"

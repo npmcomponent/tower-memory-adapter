@@ -6,6 +6,7 @@
     "tower-model": "*",
     "tower-strcase": "*",
     "tower-adapter": "*",
+    "tower-operator": "*",
     "inflection": "~1.2.5"
   },
   "devDependencies": {
