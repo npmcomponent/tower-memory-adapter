@@ -11,6 +11,9 @@
     "tower"
   ],
   "dependencies": {
+    "tower-container": "*",
+    "tower-model": "*",
+    "tower-strcase": "*",
     "tower-adapter": "*"
   },
   "scripts": ["index.js"],

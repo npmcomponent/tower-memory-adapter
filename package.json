@@ -2,7 +2,11 @@
   "name": "tower-memory-adapter",
   "version": "0.0.1",
   "dependencies": {
-    "tower-adapter": "*"
+    "tower-container": "*",
+    "tower-model": "*",
+    "tower-strcase": "*",
+    "tower-adapter": "*",
+    "inflection": "~1.2.5"
   },
   "devDependencies": {
     "chai": "~1.4.2",
