@@ -66,6 +66,7 @@ describe('memoryAdapter', function(){
     var criteria = [
         ['start', 'comments']
       , ['relation', 'outgoing', 'post']
+      // or, if length == 6 then collection.property
       , ['condition', 'eq', 'post.title', 'post two']
       , ['return', 'comments']
       , ['action', 'query']
