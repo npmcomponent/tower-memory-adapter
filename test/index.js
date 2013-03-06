@@ -6,14 +6,15 @@ var MemoryAdapter = require('..')
 
 var database = {
   posts: [
-      { id: 1, title: 'post one' }
-    , { id: 2, title: 'post two' }
-    , { id: 3, title: 'post three' }
+      { id: 1, title: 'post one', likeCount: 20 }
+    , { id: 2, title: 'post two', likeCount: 15 }
+    , { id: 3, title: 'post three', likeCount: 3 }
+    , { id: 4, title: 'post two', likeCount: 5 }
   ],
 
   comments: [
       { id: 10, message: 'comment one', userId: 100, embeddedIn: 'post' } // embedded
-    , { id: 10, message: 'comment one', userId: 101, postId: 1 } // referenced
+    , { id: 10, message: 'comment one', userId: 101, postId: 2 } // referenced
   ],
 
   users: [
@@ -26,7 +27,8 @@ adapter('memory').prototype.recordsByType = database;
 
 describe('memoryAdapter', function(){
   var Post = model('post')
-    .attr('title', { type: 'string' });
+    .attr('title', { type: 'string' })
+    .attr('likeCount', { type: 'number' });
 
   /*
   it('should execute criteria', function(done){
@@ -47,12 +49,31 @@ describe('memoryAdapter', function(){
     var criteria = [
         ['start', 'posts']
       , ['condition', 'eq', 'title', 'post two']
+      , ['condition', 'gte', 'likeCount', 5]
+      , ['action', 'query']
+    ];
+
+    adapter('memory').execute(criteria, function(err, records){
+      assert.equal(2, records.length);
+      assert.equal('post two', records[0].title);
+      assert.equal('post two', records[1].title);
+      done();
+    });
+  })
+
+  it('should query multiple collections', function(done){
+    // something along these lines, still thinking..
+    var criteria = [
+        ['start', 'comments']
+      , ['relation', 'outgoing', 'post']
+      , ['condition', 'eq', 'post.title', 'post two']
+      , ['return', 'comments']
       , ['action', 'query']
     ];
 
     adapter('memory').execute(criteria, function(err, records){
       assert.equal(1, records.length);
-      assert.deepEqual({ id: 2, title: 'post two' }, records[0]);
+      assert.equal('post two', records[0].title);
       done();
     });
   })
