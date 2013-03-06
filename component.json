@@ -1,0 +1,18 @@
+{
+  "name": "tower-memory-adapter",
+  "repo": "tower/memory-adapter",
+  "description": "Tower Memory Adapter component",
+  "version": "0.0.1",
+  "keywords": [
+    "data",
+    "datastore",
+    "database",
+    "mvc",
+    "tower"
+  ],
+  "dependencies": {
+    "tower-adapter": "*"
+  },
+  "scripts": ["index.js"],
+  "license": "MIT"
+}
