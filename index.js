@@ -4,81 +4,188 @@
  */
 
 var adapter = require('tower-adapter')
-  , container = require('tower-container')
-  , model = require('tower-model')
-  , operators = require('tower-operator')
-  , strcase = require('tower-strcase')
-  // XXX: strip out pluralize/singularize into single
-  //      function components.
-  , inflection = require('inflection')
-  , MemoryAdapter = adapter('memory');
+  , topology = require('tower-topology')
+  , Topology = topology('memory')
+  , stream = require('tower-stream')
+  , noop = function(){};
 
 /**
- * Expose `MemoryAdapter`.
+ * Expose `memory` adapter.
  */
 
-module.exports = MemoryAdapter;
+var exports = module.exports = adapter('memory');
 
-MemoryAdapter
-  .type('string');
+/**
+ * Collections by name.
+ */
 
-MemoryAdapter.prototype.initialize = function(){
-  if (this.initialized) return;
-  //this.recordsByType = {};
-  this.initialized = true; // XXX: tmp hack
+exports.collections = {};
+
+/**
+ * Define MongoDB adapter.
+ */
+
+exports
+  .type('string')
+  .type('text')
+  .type('date')
+  .type('float')
+  .type('integer')
+  .type('number')
+  .type('boolean')
+  .type('bitmask')
+  .type('array');
+
+/**
+ * Find records.
+ */
+
+stream('memory.find')
+  .on('execute', function(context, data, next){
+    var records = collection(context.collectionName)
+      , criteria = context.criteria;
+
+    // iterate
+  });
+
+/**
+ * Create records.
+ */
+
+stream('memory.create')
+  .on('execute', function(ctx, data, fn){
+    var records = collection(context.collectionName)
+      , criteria = ctx.criteria;
+
+    //create(data.records, fn);
+  });
+
+/**
+ * Update records.
+ */
+
+stream('memory.update')
+  .on('execute', function(context, data, next){
+    var criteria = context.criteria;
+
+    
+  });
+
+/**
+ * Remove records.
+ */
+
+stream('memory.remove')
+  .on('execute', function(context, data, next){
+    var criteria = context.criteria;
+
+    
+  });
+
+/**
+ * Execute a database query.
+ */
+
+exports.execute = function(criteria, fn){
+  var topology = new Topology
+    , name;
+
+  // XXX: this function should just split the criteria by model/adapter.
+  // then the adapter
+  for (var i = 0, n = criteria.length; i < n; i++) {
+    var criterion = criteria[i];
+    switch (criterion[0]) {
+      case 'select':
+      case 'start':
+        topology.stream(name = 'memory.find', { constraints: [] });
+        break;
+      case 'constraint':
+        topology.streams[name].constraints.push(criterion);
+        break;
+    }
+  }
+
+  // XXX: need to come up w/ API for adding events before it's executed.
+  process.nextTick(function(){
+    topology.execute();
+  });
+
+  return topology;
 }
 
 /**
- * Parse the `criteria` object and execute.
+ * Connect.
  *
- * @param {Array}     criteria
- * @param {Function}  fn
+ * @param {String} name
+ * @param {Function} fn
  * @api public
  */
 
-MemoryAdapter.prototype.execute = function(criteria, fn){
-  this.initialize();
-  // assuming for now that all criteria start with ['start', collectionName]
-  // and end with an action. Then, all intermediate criterion are conditions.
-  // XXX: will expand in a bit.
-
-  var action = criteria[criteria.length - 1];
-
-  this[action[1]](criteria, fn);
+exports.connect = function(name, fn){
+  if (fn) fn();
 }
 
-MemoryAdapter.prototype.insert = function(criteria, fn){
-  var start = criteria[0];
-  var Model = model(inflection.singularize(start[1]));
+/**
+ * Disconnect.
+ *
+ * @param {String} name
+ * @param {Function} fn
+ * @api public
+ */
 
-  fn(null, this.recordsByType[0] = criteria.pop()[2]);
+exports.disconnect = function(name, fn){
+  if (fn) fn();
 }
 
-MemoryAdapter.prototype.query = function(criteria, fn){
-  var type = criteria[0][1]
-    , collection = this.recordsByType[type]
-    , result = []
-    , condition
-    , attrs = model(inflection.singularize(type)).attrs
-    , record;
+/**
+ * Create a database/collection/index.
+ *
+ * @param {String} name
+ * @param {Function} fn
+ * @api public
+ */
 
-  loop1:
-  for (var i = 1, n = collection.length; i < n; i++) {
-    record = collection[i];
-    loop2:
-    for (var j = 1, m = criteria.length - 1; j < m; j++) {
-      // [ 'condition', 'eq', 'title', 'two' ]
-      condition = criteria[j];
-      // XXX: need to get field type from schema.
-      var attrType = attrs[condition[2]].type;
-      // XXX: this isn't correct yet, only accounts for one condition.
-      if (!operators[attrType + '.' + condition[1]](record[condition[2]], condition[3])){
-        record = null;
-        break loop2;
-      }
-    }
-    if (record) result.push(record);
-  }
+exports.create = function(name, fn){
+  return exports.collections[name] = [];
+}
 
-  fn(null, result);
+/**
+ * Update a database/collection/index.
+ *
+ * @param {String} name
+ * @param {Function} fn
+ * @api public
+ */
+
+exports.update = function(name, fn){
+
+}
+
+/**
+ * Remove a database/collection/index.
+ *
+ * @param {String} name
+ * @param {Function} fn
+ * @api public
+ */
+
+exports.remove = function(name, fn){
+  delete exports.collections[name];
+  return exports;
+}
+
+/**
+ * Find a database/collection/index.
+ *
+ * @param {String} name
+ * @param {Function} fn
+ * @api public
+ */
+
+exports.find = function(name, fn){
+  return exports.collections[name];
+}
+
+function collection(name) {
+  return exports.collections[name] || (exports.collections[name] = []);
 }

@@ -2,19 +2,10 @@
   "name": "tower-memory-adapter",
   "version": "0.0.1",
   "dependencies": {
-    "tower-container": "*",
     "tower-model": "*",
     "tower-strcase": "*",
     "tower-adapter": "*",
-    "tower-operator": "*",
-    "inflection": "~1.2.5"
-  },
-  "devDependencies": {
-    "chai": "~1.4.2",
-    "mocha": "~1.8.1"
-  },
-  "scripts": {
-    "test": "mocha"
+    "tower-operator": "*"
   },
   "main": "./index.js"
 }

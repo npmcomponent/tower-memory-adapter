@@ -1,8 +1,7 @@
-var MemoryAdapter = require('..')
+var memory = require('..')
   , adapter = require('tower-adapter')
-  , container = require('tower-container')
   , model = require('tower-model')
-  , assert = require('chai').assert;
+  , assert = require('assert');
 
 var database = {
   posts: [
@@ -59,7 +58,7 @@ describe('memoryAdapter', function(){
       assert.equal('post two', records[1].title);
       done();
     });
-  })
+  });
 
   it('should query multiple collections', function(done){
     // something along these lines, still thinking..
