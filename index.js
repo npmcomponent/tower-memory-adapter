@@ -202,8 +202,6 @@ function update(context, data, next) {
     for (var key in data) records[i][key] = data[key];
   }
 
-  console.log(records, data)
-
   context.emit('data', records);
 }
 
