@@ -5,10 +5,10 @@
 
 var adapter = require('tower-adapter')
   , topology = require('tower-topology')
-  , Topology = topology('memory')
   , action = require('tower-stream')
   , filter = require('tower-filter')
-  , validate = require('tower-validate');
+  , validate = require('tower-validate')
+  , queryToTopology = require('tower-query-to-topology');
 
 /**
  * Expose `memory` adapter.
@@ -70,29 +70,7 @@ action('memory.remove')
  */
 
 exports.execute = function(constraints, fn){
-  var topology = new Topology
-    , name;
-
-  var action = constraints[constraints.length - 1][1];
-
-  // XXX: this function should just split the constraints by model/adapter.
-  // then the adapter
-  for (var i = 0, n = constraints.length; i < n; i++) {
-    var constraint = constraints[i];
-    switch (constraint[0]) {
-      case 'select':
-      case 'start':
-        topology.stream(name = 'memory.' + action, { constraints: [], collectionName: constraint[1] });
-        break;
-      case 'constraint':
-        // XXX: shouldn't have to create another array here, tmp for now.
-        topology.streams[name].constraints.push([ constraint[2], constraint[1], constraint[3] ]);
-        break;
-      case 'action':
-        topology.streams[name].data = constraint[2];
-        break;
-    }
-  }
+  var topology = queryToTopology('memory', constraints);
 
   // XXX: need to come up w/ API for adding events before it's executed.
   process.nextTick(function(){
@@ -205,13 +183,14 @@ function create(ctx, data, fn) {
 
 function update(context, data, next) {
   var records = collection(context.collectionName)
-    , data = context.data;
+    , data = context.data
+    , constraints = context.constraints;
 
   // XXX: or `isBlank`
   // if (!data)
 
-  if (context.constraints)
-    records = filter(records, context.constraints);
+  if (constraints.length)
+    records = filter(records, constraints);
 
   // XXX: this could be optimized to just iterate once
   //      by reimpl part of `filter` here.
@@ -222,6 +201,8 @@ function update(context, data, next) {
     // XXX: `merge` part?
     for (var key in data) records[i][key] = data[key];
   }
+
+  console.log(records, data)
 
   context.emit('data', records);
 }

@@ -1,22 +1,23 @@
-var memory = require('..')
-  , adapter = require('tower-adapter')
+var query = require('tower-query')
   , model = require('tower-model')
+  , memory = require('..')
+  , adapter = require('tower-adapter')
   , assert = require('assert');
 
 var database = {
-  posts: [
+  post: [
       { id: 1, title: 'post one', likeCount: 20 }
     , { id: 2, title: 'post two', likeCount: 15 }
     , { id: 3, title: 'post three', likeCount: 3 }
     , { id: 4, title: 'post two', likeCount: 5 }
   ],
 
-  comments: [
+  comment: [
       { id: 10, message: 'comment one', userId: 100, embeddedIn: 'post' } // embedded
     , { id: 10, message: 'comment one', userId: 101, postId: 2 } // referenced
   ],
 
-  users: [
+  user: [
       { id: 100, email: 'user100@email.com' }
     , { id: 101, email: 'user101@email.com' }
   ]
@@ -45,70 +46,61 @@ describe('memoryAdapter', function(){
   */
 
   it('should find', function(done){
-    var criteria = [
-        ['start', 'posts']
-      , ['constraint', 'eq', 'title', 'post two']
-      , ['constraint', 'gte', 'likeCount', 5]
-      , ['action', 'query']
-    ];
-
-    // adapter('memory').execute(criteria, function(err, records){
-    adapter('memory').execute(criteria).on('data', function(records){
-      assert.equal(2, records.length);
-      assert.equal('post two', records[0].title);
-      assert.equal('post two', records[1].title);
-      done();
-    });
+    query()
+      .use('memory')
+      .start('post')
+      .where('title').eq('post two')
+      .where('likeCount').gte(5)
+      .query()
+      .on('data', function(records){
+        assert.equal(2, records.length);
+        assert.equal('post two', records[0].title);
+        assert.equal('post two', records[1].title);
+        done();
+      });
   });
 
   it('should create', function(done){
-    var criteria = [
-        ['start', 'posts']
-      , ['action', 'create', [ { id: 5, title: 'foo' } ]]
-    ];
+    query()
+      .use('memory')
+      .start('post')
+      .create([ { id: 5, title: 'foo' } ])
+      .on('data', function(records){
+        assert(1 === records.length);
+        assert('foo' === records[0].title);
 
-    adapter('memory').execute(criteria).on('data', function(records){
-      assert(1 === records.length);
-      assert('foo' === records[0].title);
-
-      var criteria = [
-          ['start', 'posts']
-        , ['action', 'query']
-      ];
-
-      adapter('memory').execute(criteria).on('data', function(records){
-        assert(5 === records.length);
-        database.posts.pop();
-        done();
+        query()
+          .use('memory')
+          .start('post')
+          .query()
+          .on('data', function(records){
+            assert(5 === records.length);
+            database.post.pop();
+            done();
+          });
       });
-    });
   });
 
   it('should update', function(done){
-    var criteria = [
-        ['start', 'posts']
-        // XXX: update records manually
-        //, ['action', 'update', [ { id: 3, title: 'post three!!!' } ]]
-        // update records matching pattern
-      , ['constraint', 'eq', 'title', 'post three']
-      , ['action', 'update', { title: 'post three!!!' } ]
-    ];
+    query()
+      .use('memory')
+      .start('post')
+      .where('title').eq('post three')
+      .update({ title: 'post three!!!' })
+      .on('data', function(records){
+        assert(1 === records.length);
+        assert('post three!!!' === records[0].title);
 
-    adapter('memory').execute(criteria).on('data', function(records){
-      assert(1 === records.length);
-      assert('post three!!!' === records[0].title);
-
-      var criteria = [
-          ['start', 'posts']
-        , ['action', 'query']
-      ];
-
-      adapter('memory').execute(criteria).on('data', function(records){
-        assert(4 === records.length);
-        records[2].title = 'post three';
-        done();
+        query()
+          .use('memory')
+          .start('post')
+          .query()
+          .on('data', function(records){
+            assert(4 === records.length);
+            records[2].title = 'post three';
+            done();
+          });
       });
-    });
   });
 
   it('should remove', function(done){

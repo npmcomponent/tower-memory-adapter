@@ -9,5 +9,8 @@
     "tower-filter": "*",
     "tower-validate": "*"
   },
+  "devDependencies": {
+    "tower-query": "*"
+  },
   "main": "./index.js"
 }
