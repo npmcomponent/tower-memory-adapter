@@ -5,7 +5,8 @@
     "tower-model": "*",
     "tower-strcase": "*",
     "tower-adapter": "*",
-    "tower-operator": "*"
+    "tower-operator": "*",
+    "tower-filter": "*"
   },
   "main": "./index.js"
 }

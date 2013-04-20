@@ -6,14 +6,15 @@
 var adapter = require('tower-adapter')
   , topology = require('tower-topology')
   , Topology = topology('memory')
-  , stream = require('tower-stream')
+  , action = require('tower-stream')
+  , filter = require('tower-filter')
   , noop = function(){};
 
 /**
  * Expose `memory` adapter.
  */
 
-var exports = module.exports = adapter('memory');
+exports = module.exports = adapter('memory');
 
 /**
  * Collections by name.
@@ -40,22 +41,29 @@ exports
  * Find records.
  */
 
-stream('memory.find')
-  .on('execute', function(context, data, next){
-    var records = collection(context.collectionName)
-      , criteria = context.criteria;
+action('memory.find')
+  .on('exec', function(ctx, data, fn){
+    var records = collection(ctx.collectionName)
+      , constraints = ctx.constraints;
 
-    // iterate
+    if (constraints.length) {
+      ctx.emit('data', filter(records, constraints));
+    } else {
+      // optimized case of no query params
+      ctx.emit('data', records);
+    }
+    
+    fn();
   });
 
 /**
  * Create records.
  */
 
-stream('memory.create')
-  .on('execute', function(ctx, data, fn){
-    var records = collection(context.collectionName)
-      , criteria = ctx.criteria;
+action('memory.create')
+  .on('exec', function(ctx, data, fn){
+    var records = collection(ctx.collectionName)
+      , constraints = ctx.constraints;
 
     //create(data.records, fn);
   });
@@ -64,9 +72,9 @@ stream('memory.create')
  * Update records.
  */
 
-stream('memory.update')
-  .on('execute', function(context, data, next){
-    var criteria = context.criteria;
+action('memory.update')
+  .on('exec', function(context, data, next){
+    var constraints = context.constraints;
 
     
   });
@@ -75,9 +83,9 @@ stream('memory.update')
  * Remove records.
  */
 
-stream('memory.remove')
-  .on('execute', function(context, data, next){
-    var criteria = context.criteria;
+action('memory.remove')
+  .on('exec', function(context, data, next){
+    var constraints = context.constraints;
 
     
   });
@@ -86,28 +94,29 @@ stream('memory.remove')
  * Execute a database query.
  */
 
-exports.execute = function(criteria, fn){
+exports.execute = function(constraints, fn){
   var topology = new Topology
     , name;
 
-  // XXX: this function should just split the criteria by model/adapter.
+  // XXX: this function should just split the constraints by model/adapter.
   // then the adapter
-  for (var i = 0, n = criteria.length; i < n; i++) {
-    var criterion = criteria[i];
-    switch (criterion[0]) {
+  for (var i = 0, n = constraints.length; i < n; i++) {
+    var constraint = constraints[i];
+    switch (constraint[0]) {
       case 'select':
       case 'start':
-        topology.stream(name = 'memory.find', { constraints: [] });
+        topology.stream(name = 'memory.find', { constraints: [], collectionName: constraint[1] });
         break;
       case 'constraint':
-        topology.streams[name].constraints.push(criterion);
+        // XXX: shouldn't have to create another array here, tmp for now.
+        topology.streams[name].constraints.push([ constraint[2], constraint[1], constraint[3] ]);
         break;
     }
   }
 
   // XXX: need to come up w/ API for adding events before it's executed.
   process.nextTick(function(){
-    topology.execute();
+    topology.exec();
   });
 
   return topology;

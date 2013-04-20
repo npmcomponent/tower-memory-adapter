@@ -22,7 +22,7 @@ var database = {
   ]
 }
 
-adapter('memory').prototype.recordsByType = database;
+adapter('memory').collections = database;
 
 describe('memoryAdapter', function(){
   var Post = model('post')
@@ -47,12 +47,13 @@ describe('memoryAdapter', function(){
   it('should query', function(done){
     var criteria = [
         ['start', 'posts']
-      , ['condition', 'eq', 'title', 'post two']
-      , ['condition', 'gte', 'likeCount', 5]
+      , ['constraint', 'eq', 'title', 'post two']
+      , ['constraint', 'gte', 'likeCount', 5]
       , ['action', 'query']
     ];
 
-    adapter('memory').execute(criteria, function(err, records){
+    // adapter('memory').execute(criteria, function(err, records){
+    adapter('memory').execute(criteria).on('data', function(records){
       assert.equal(2, records.length);
       assert.equal('post two', records[0].title);
       assert.equal('post two', records[1].title);
@@ -66,12 +67,12 @@ describe('memoryAdapter', function(){
         ['start', 'comments']
       , ['relation', 'outgoing', 'post']
       // or, if length == 6 then collection.property
-      , ['condition', 'eq', 'post.title', 'post two']
+      , ['constraint', 'eq', 'post.title', 'post two']
       , ['return', 'comments']
       , ['action', 'query']
     ];
 
-    adapter('memory').execute(criteria, function(err, records){
+    adapter('memory').execute(criteria).on('data', function(records){
       assert.equal(1, records.length);
       assert.equal('post two', records[0].title);
       done();
