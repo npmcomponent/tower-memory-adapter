@@ -8,6 +8,7 @@ var adapter = require('tower-adapter')
   , Topology = topology('memory')
   , action = require('tower-stream')
   , filter = require('tower-filter')
+  , validate = require('tower-validate')
   , noop = function(){};
 
 /**
@@ -77,8 +78,8 @@ action('memory.create')
 
 action('memory.update')
   .on('exec', function(context, data, next){
-    var records = collection(context.collectionName);
-      data = context.data;
+    var records = collection(context.collectionName)
+      , data = context.data;
 
     // XXX: or `isBlank`
     // if (!data)
@@ -88,6 +89,9 @@ action('memory.update')
 
     // XXX: this could be optimized to just iterate once
     //      by reimpl part of `filter` here.
+    // XXX: or maybe there is a `each-array-and-remove` that
+    // is a slightly different iteration pattern so you can
+    // remove/modify items while iterating.
     for (var i = 0, n = records.length; i < n; i++) {
       // XXX: `merge` part?
       for (var key in data) records[i][key] = data[key];
@@ -101,10 +105,31 @@ action('memory.update')
  */
 
 action('memory.remove')
-  .on('exec', function(context, data, next){
-    var constraints = context.constraints;
+  .on('exec', function(context, data, fn){
+    var records = collection(context.collectionName)
+      , constraints = context.constraints;
 
-    
+    var result = [];
+
+    if (constraints) {
+      // XXX: or `filter(r, c, true)` where `true` says remove from array
+      // or maybe there is a `filter.compile` function, that
+      // creates an optimized filter given parameters.
+      // records = filter(records, context.constraints, function(record, i, array){
+      //   array.splice(i, 1);
+      // });
+      var i = records.length;
+
+      // XXX: is there a more optimal algorithm?
+      while (--i) {
+        if (validate(records[i], constraints)) {
+          result.unshift(records.splice(i, 1)[0]);
+        }
+      }
+    }
+
+    context.emit('data', result);
+    fn();
   });
 
 /**

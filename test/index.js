@@ -111,7 +111,28 @@ describe('memoryAdapter', function(){
     });
   });
 
-  it('should remove');
+  it('should remove', function(done){
+    var criteria = [
+        ['start', 'posts']
+      , ['constraint', 'eq', 'title', 'post three']
+      , ['action', 'remove' ]
+    ];
+
+    adapter('memory').execute(criteria).on('data', function(records){
+      assert(1 === records.length);
+      assert('post three' === records[0].title);
+
+      var criteria = [
+          ['start', 'posts']
+        , ['action', 'query']
+      ];
+
+      adapter('memory').execute(criteria).on('data', function(currentRecords){
+        assert(3 === currentRecords.length);
+        done();
+      });
+    });
+  });
 
   /*it('should query multiple collections', function(done){
     // something along these lines, still thinking..

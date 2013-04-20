@@ -6,7 +6,8 @@
     "tower-strcase": "*",
     "tower-adapter": "*",
     "tower-operator": "*",
-    "tower-filter": "*"
+    "tower-filter": "*",
+    "tower-validate": "*"
   },
   "main": "./index.js"
 }
