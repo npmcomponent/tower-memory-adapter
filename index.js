@@ -8,8 +8,7 @@ var adapter = require('tower-adapter')
   , Topology = topology('memory')
   , action = require('tower-stream')
   , filter = require('tower-filter')
-  , validate = require('tower-validate')
-  , noop = function(){};
+  , validate = require('tower-validate');
 
 /**
  * Expose `memory` adapter.
@@ -43,87 +42,28 @@ exports
  */
 
 action('memory.query')
-  .on('exec', function(ctx, data, fn){
-    var records = collection(ctx.collectionName)
-      , constraints = ctx.constraints;
-
-    if (constraints.length) {
-      ctx.emit('data', filter(records, constraints));
-    } else {
-      // optimized case of no query params
-      ctx.emit('data', records);
-    }
-    
-    fn();
-  });
+  .on('exec', query);
 
 /**
  * Create records.
  */
 
 action('memory.create')
-  .on('exec', function(ctx, data, fn){
-    var records = collection(ctx.collectionName)
-      , constraints = ctx.constraints;
-
-    // XXX: generate uuid
-    records.push.apply(records, ctx.data);
-    ctx.emit('data', ctx.data);
-    fn();
-  });
+  .on('exec', create);
 
 /**
  * Update records.
  */
 
 action('memory.update')
-  .on('exec', function(context, data, next){
-    var records = collection(context.collectionName)
-      , data = context.data;
-
-    // XXX: or `isBlank`
-    // if (!data)
-
-    if (context.constraints)
-      records = filter(records, context.constraints);
-
-    // XXX: this could be optimized to just iterate once
-    //      by reimpl part of `filter` here.
-    // XXX: or maybe there is a `each-array-and-remove` that
-    // is a slightly different iteration pattern so you can
-    // remove/modify items while iterating.
-    for (var i = 0, n = records.length; i < n; i++) {
-      // XXX: `merge` part?
-      for (var key in data) records[i][key] = data[key];
-    }
-
-    context.emit('data', records);
-  });
+  .on('exec', update);
 
 /**
  * Remove records.
  */
 
 action('memory.remove')
-  .on('exec', function(context, data, fn){
-    var records = collection(context.collectionName)
-      , constraints = context.constraints;
-
-    var result = [];
-
-    if (constraints) {
-      var i = records.length;
-
-      while (i--) {
-        if (validate(records[i], constraints)) {
-          result.unshift(records.splice(i, 1)[0]);
-        }
-      }
-    }
-
-    context.emit('data', result);
-    fn();
-  });
+  .on('exec', remove);
 
 /**
  * Execute a database query.
@@ -237,4 +177,71 @@ exports.find = function(name, fn){
 
 function collection(name) {
   return exports.collections[name] || (exports.collections[name] = []);
+}
+
+function query(ctx, data, fn) {
+  var records = collection(ctx.collectionName)
+    , constraints = ctx.constraints;
+
+  if (constraints.length) {
+    ctx.emit('data', filter(records, constraints));
+  } else {
+    // optimized case of no query params
+    ctx.emit('data', records);
+  }
+  
+  fn();
+}
+
+function create(ctx, data, fn) {
+  var records = collection(ctx.collectionName)
+    , constraints = ctx.constraints;
+
+  // XXX: generate uuid
+  records.push.apply(records, ctx.data);
+  ctx.emit('data', ctx.data);
+  fn();
+}
+
+function update(context, data, next) {
+  var records = collection(context.collectionName)
+    , data = context.data;
+
+  // XXX: or `isBlank`
+  // if (!data)
+
+  if (context.constraints)
+    records = filter(records, context.constraints);
+
+  // XXX: this could be optimized to just iterate once
+  //      by reimpl part of `filter` here.
+  // XXX: or maybe there is a `each-array-and-remove` that
+  // is a slightly different iteration pattern so you can
+  // remove/modify items while iterating.
+  for (var i = 0, n = records.length; i < n; i++) {
+    // XXX: `merge` part?
+    for (var key in data) records[i][key] = data[key];
+  }
+
+  context.emit('data', records);
+}
+
+function remove(context, data, fn) {
+  var records = collection(context.collectionName)
+    , constraints = context.constraints;
+
+  var result = [];
+
+  if (constraints) {
+    var i = records.length;
+
+    while (i--) {
+      if (validate(records[i], constraints)) {
+        result.unshift(records.splice(i, 1)[0]);
+      }
+    }
+  }
+
+  context.emit('data', result);
+  fn();
 }
