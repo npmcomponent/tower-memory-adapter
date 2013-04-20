@@ -24,7 +24,7 @@ exports = module.exports = adapter('memory');
 exports.collections = {};
 
 /**
- * Define MongoDB adapter.
+ * Adapter data types.
  */
 
 exports
