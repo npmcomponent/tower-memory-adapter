@@ -78,10 +78,40 @@ describe('memoryAdapter', function(){
 
       adapter('memory').execute(criteria).on('data', function(records){
         assert(5 === records.length);
+        database.posts.pop();
         done();
       });
     });
   });
+
+  it('should update', function(done){
+    var criteria = [
+        ['start', 'posts']
+        // XXX: update records manually
+        //, ['action', 'update', [ { id: 3, title: 'post three!!!' } ]]
+        // update records matching pattern
+      , ['constraint', 'eq', 'title', 'post three']
+      , ['action', 'update', { title: 'post three!!!' } ]
+    ];
+
+    adapter('memory').execute(criteria).on('data', function(records){
+      assert(1 === records.length);
+      assert('post three!!!' === records[0].title);
+
+      var criteria = [
+          ['start', 'posts']
+        , ['action', 'query']
+      ];
+
+      adapter('memory').execute(criteria).on('data', function(records){
+        assert(4 === records.length);
+        records[2].title = 'post three';
+        done();
+      });
+    });
+  });
+
+  it('should remove');
 
   /*it('should query multiple collections', function(done){
     // something along these lines, still thinking..

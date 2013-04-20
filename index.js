@@ -77,9 +77,23 @@ action('memory.create')
 
 action('memory.update')
   .on('exec', function(context, data, next){
-    var constraints = context.constraints;
+    var records = collection(context.collectionName);
+      data = context.data;
 
-    
+    // XXX: or `isBlank`
+    // if (!data)
+
+    if (context.constraints)
+      records = filter(records, context.constraints);
+
+    // XXX: this could be optimized to just iterate once
+    //      by reimpl part of `filter` here.
+    for (var i = 0, n = records.length; i < n; i++) {
+      // XXX: `merge` part?
+      for (var key in data) records[i][key] = data[key];
+    }
+
+    context.emit('data', records);
   });
 
 /**
