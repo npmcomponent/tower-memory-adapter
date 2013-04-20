@@ -44,7 +44,7 @@ describe('memoryAdapter', function(){
   });
   */
 
-  it('should query', function(done){
+  it('should find', function(done){
     var criteria = [
         ['start', 'posts']
       , ['constraint', 'eq', 'title', 'post two']
@@ -61,7 +61,29 @@ describe('memoryAdapter', function(){
     });
   });
 
-  it('should query multiple collections', function(done){
+  it('should create', function(done){
+    var criteria = [
+        ['start', 'posts']
+      , ['action', 'create', [ { id: 5, title: 'foo' } ]]
+    ];
+
+    adapter('memory').execute(criteria).on('data', function(records){
+      assert(1 === records.length);
+      assert('foo' === records[0].title);
+
+      var criteria = [
+          ['start', 'posts']
+        , ['action', 'query']
+      ];
+
+      adapter('memory').execute(criteria).on('data', function(records){
+        assert(5 === records.length);
+        done();
+      });
+    });
+  });
+
+  /*it('should query multiple collections', function(done){
     // something along these lines, still thinking..
     var criteria = [
         ['start', 'comments']
@@ -77,5 +99,5 @@ describe('memoryAdapter', function(){
       assert.equal('post two', records[0].title);
       done();
     });
-  })
+  });*/
 });

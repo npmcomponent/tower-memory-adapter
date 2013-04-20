@@ -41,7 +41,7 @@ exports
  * Find records.
  */
 
-action('memory.find')
+action('memory.query')
   .on('exec', function(ctx, data, fn){
     var records = collection(ctx.collectionName)
       , constraints = ctx.constraints;
@@ -65,7 +65,10 @@ action('memory.create')
     var records = collection(ctx.collectionName)
       , constraints = ctx.constraints;
 
-    //create(data.records, fn);
+    // XXX: generate uuid
+    records.push.apply(records, ctx.data);
+    ctx.emit('data', ctx.data);
+    fn();
   });
 
 /**
@@ -98,6 +101,8 @@ exports.execute = function(constraints, fn){
   var topology = new Topology
     , name;
 
+  var action = constraints[constraints.length - 1][1];
+
   // XXX: this function should just split the constraints by model/adapter.
   // then the adapter
   for (var i = 0, n = constraints.length; i < n; i++) {
@@ -105,11 +110,14 @@ exports.execute = function(constraints, fn){
     switch (constraint[0]) {
       case 'select':
       case 'start':
-        topology.stream(name = 'memory.find', { constraints: [], collectionName: constraint[1] });
+        topology.stream(name = 'memory.' + action, { constraints: [], collectionName: constraint[1] });
         break;
       case 'constraint':
         // XXX: shouldn't have to create another array here, tmp for now.
         topology.streams[name].constraints.push([ constraint[2], constraint[1], constraint[3] ]);
+        break;
+      case 'action':
+        topology.streams[name].data = constraint[2];
         break;
     }
   }
