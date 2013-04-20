@@ -112,16 +112,9 @@ action('memory.remove')
     var result = [];
 
     if (constraints) {
-      // XXX: or `filter(r, c, true)` where `true` says remove from array
-      // or maybe there is a `filter.compile` function, that
-      // creates an optimized filter given parameters.
-      // records = filter(records, context.constraints, function(record, i, array){
-      //   array.splice(i, 1);
-      // });
       var i = records.length;
 
-      // XXX: is there a more optimal algorithm?
-      while (--i) {
+      while (i--) {
         if (validate(records[i], constraints)) {
           result.unshift(records.splice(i, 1)[0]);
         }
