@@ -44,6 +44,9 @@ exports
 action('memory.query')
   .on('exec', query);
 
+action('memory.save')
+  .on('exec', create);
+
 /**
  * Create records.
  */
@@ -74,7 +77,7 @@ exports.execute = function(constraints, fn){
 
   // XXX: need to come up w/ API for adding events before it's executed.
   process.nextTick(function(){
-    topology.exec();
+    topology.exec(fn);
   });
 
   return topology;
