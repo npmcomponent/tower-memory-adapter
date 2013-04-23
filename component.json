@@ -17,7 +17,7 @@
     "tower/stream": "*",
     "tower/filter": "*",
     "tower/validate": "*",
-    "tower/tower-query-to-topology": "*"
+    "tower/query-to-topology": "*"
   },
   "scripts": ["index.js"],
   "license": "MIT"
