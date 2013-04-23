@@ -2,12 +2,13 @@
   "name": "tower-memory-adapter",
   "version": "0.0.1",
   "dependencies": {
-    "tower-model": "*",
-    "tower-strcase": "*",
-    "tower-adapter": "*",
-    "tower-operator": "*",
-    "tower-filter": "*",
-    "tower-validate": "*"
+    "tower/model": "*",
+    "tower/adapter": "*",
+    "tower/topology": "*",
+    "tower/stream": "*",
+    "tower/filter": "*",
+    "tower/validate": "*",
+    "tower/tower-query-to-topology": "*"
   },
   "devDependencies": {
     "tower-query": "*"

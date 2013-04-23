@@ -11,10 +11,13 @@
     "tower"
   ],
   "dependencies": {
-    "tower-model": "*",
-    "tower-strcase": "*",
-    "tower-adapter": "*",
-    "tower-operator": "*"
+    "tower/model": "*",
+    "tower/adapter": "*",
+    "tower/topology": "*",
+    "tower/stream": "*",
+    "tower/filter": "*",
+    "tower/validate": "*",
+    "tower/tower-query-to-topology": "*"
   },
   "scripts": ["index.js"],
   "license": "MIT"
