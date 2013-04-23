@@ -76,9 +76,9 @@ exports.execute = function(constraints, fn){
   var topology = queryToTopology('memory', constraints);
 
   // XXX: need to come up w/ API for adding events before it's executed.
-  process.nextTick(function(){
+  //process.nextTick(function(){
     topology.exec(fn);
-  });
+  //});
 
   return topology;
 }
