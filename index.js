@@ -8,7 +8,7 @@ var adapter = require('tower-adapter')
   , action = require('tower-stream')
   , filter = require('tower-filter')
   , validate = require('tower-validate')
-  , queryToTopology = require('tower-query-to-topology');
+  , optimizer = require('tower-query-optimizer');
 
 /**
  * Expose `memory` adapter.
@@ -41,44 +41,36 @@ exports
  * Find records.
  */
 
-action('memory.query')
-  .on('exec', query);
-
-action('memory.save')
-  .on('exec', create);
+action('memory.find', find);
 
 /**
  * Create records.
  */
 
-action('memory.create')
-  .on('exec', create);
+action('memory.create', create);
 
 /**
  * Update records.
  */
 
-action('memory.update')
-  .on('exec', update);
+action('memory.update', update);
 
 /**
  * Remove records.
  */
 
-action('memory.remove')
-  .on('exec', remove);
+action('memory.remove', remove);
 
 /**
  * Execute a database query.
  */
 
-exports.execute = function(constraints, fn){
-  var topology = queryToTopology('memory', constraints);
+exports.exec = function(query, fn){
+  var topology = optimizer.topology('memory', query.criteria);
 
-  // XXX: need to come up w/ API for adding events before it's executed.
-  //process.nextTick(function(){
+  process.nextTick(function(){
     topology.exec(fn);
-  //});
+  });
 
   return topology;
 }
@@ -160,7 +152,7 @@ function collection(name) {
   return exports.collections[name] || (exports.collections[name] = []);
 }
 
-function query(ctx, data, fn) {
+function find(ctx, data, fn) {
   var records = collection(ctx.collectionName)
     , constraints = ctx.constraints;
 
@@ -184,10 +176,10 @@ function create(ctx, data, fn) {
   fn();
 }
 
-function update(context, data, next) {
-  var records = collection(context.collectionName)
-    , data = context.data
-    , constraints = context.constraints;
+function update(ctx, data, next) {
+  var records = collection(ctx.collectionName)
+    , data = ctx.data
+    , constraints = ctx.constraints;
 
   // XXX: or `isBlank`
   // if (!data)
@@ -205,12 +197,12 @@ function update(context, data, next) {
     for (var key in data) records[i][key] = data[key];
   }
 
-  context.emit('data', records);
+  ctx.emit('data', records);
 }
 
-function remove(context, data, fn) {
-  var records = collection(context.collectionName)
-    , constraints = context.constraints;
+function remove(ctx, data, fn) {
+  var records = collection(ctx.collectionName)
+    , constraints = ctx.constraints;
 
   var result = [];
 
@@ -224,6 +216,6 @@ function remove(context, data, fn) {
     }
   }
 
-  context.emit('data', result);
+  ctx.emit('data', result);
   fn();
 }
