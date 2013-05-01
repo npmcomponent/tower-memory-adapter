@@ -153,7 +153,7 @@ function collection(name) {
 }
 
 function find(ctx, data, fn) {
-  var records = collection(ctx.collectionName)
+  var records = collection(ctx.collectionName.model)
     , constraints = ctx.constraints;
 
   if (constraints.length) {
@@ -167,7 +167,7 @@ function find(ctx, data, fn) {
 }
 
 function create(ctx, data, fn) {
-  var records = collection(ctx.collectionName)
+  var records = collection(ctx.collectionName.model)
     , constraints = ctx.constraints;
 
   // XXX: generate uuid
