@@ -4,9 +4,8 @@
  */
 
 var adapter = require('tower-adapter')
-  , action = require('tower-stream')
-  , filter = require('tower-filter')
-  , validate = require('tower-validate');
+  , stream = require('tower-stream')
+  , query = require('tower-query');
 
 /**
  * Expose `memory` adapter.
@@ -39,36 +38,36 @@ exports
  * Find records.
  */
 
-action('memory.find', find);
+stream('memory.find', find);
 
 /**
  * Create records.
  */
 
-action('memory.create', create);
+stream('memory.create', create);
 
 /**
  * Update records.
  */
 
-action('memory.update', update);
+stream('memory.update', update);
 
 /**
  * Remove records.
  */
 
-action('memory.remove', remove);
+stream('memory.remove', remove);
 
 /**
  * Execute a database query.
  */
 
 exports.exec = function(query, fn){
-  var topology = new Topology
-    , criteria = query.criteria
+  var criteria = query.criteria
     , action = criteria[criteria.length - 1][1].type
     , name
     , constraint
+    , program
     // find/create/update/remove;
 
   for (var i = 0, n = criteria.length; i < n; i++) {
@@ -76,24 +75,28 @@ exports.exec = function(query, fn){
     switch (constraint[0]) {
       case 'select':
       case 'start':
-        topology.stream(name = 'memory' + '.' + action, { constraints: [], collectionName: constraint[1] });
+        program = stream(name = 'memory' + '.' + action).create({
+          constraints: [],
+          collectionName: constraint[1]
+        });
         break;
       case 'constraint':
         // XXX: shouldn't have to create another array here, tmp for now.
-        topology.streams[name].constraints.push([ constraint[1].attr, constraint[2], constraint[3] ]);
+        program.constraints.push(constraint[1]);
         break;
       case 'action':
-        topology.streams[name].data = constraint[1].data;
+        program.data = constraint[1].data;
         break;
     }
   }
 
-  console.log(topology)
-
   // XXX: process.nextTick
-  topology.exec(fn);
+  program.on('data', function(records){
+    fn(null, records);
+  });
+  program.exec();
 
-  return topology;
+  return program;
 }
 
 /**
@@ -178,13 +181,15 @@ function find(ctx, data, fn) {
     , constraints = ctx.constraints;
 
   if (constraints.length) {
-    ctx.emit('data', filter(records, constraints));
+    ctx.emit('data', query.filter(records, constraints));
   } else {
     // optimized case of no query params
     ctx.emit('data', records);
   }
   
   fn();
+
+  ctx.close();
 }
 
 function create(ctx, data, fn) {

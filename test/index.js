@@ -51,8 +51,7 @@ describe('memoryAdapter', function(){
       .start('post')
       .where('title').eq('post two')
       .where('likeCount').gte(5)
-      .query()
-      .on('data', function(records){
+      .find(function(err, records){
         assert.equal(2, records.length);
         assert.equal('post two', records[0].title);
         assert.equal('post two', records[1].title);
@@ -64,16 +63,14 @@ describe('memoryAdapter', function(){
     query()
       .use('memory')
       .start('post')
-      .create([ { id: 5, title: 'foo' } ])
-      .on('data', function(records){
+      .create([ { id: 5, title: 'foo' } ], function(err, records){
         assert(1 === records.length);
         assert('foo' === records[0].title);
 
         query()
           .use('memory')
           .start('post')
-          .query()
-          .on('data', function(records){
+          .find(function(records){
             assert(5 === records.length);
             database.post.pop();
             done();
