@@ -13,8 +13,7 @@
   "dependencies": {
     "tower/adapter": "*",
     "tower/stream": "*",
-    "tower/filter": "*",
-    "tower/validate": "*"
+    "tower/query": "*"
   },
   "scripts": ["index.js"],
   "license": "MIT"

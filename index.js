@@ -191,6 +191,7 @@ function find(ctx, data, fn) {
   }
 
   // XXX: sort
+  // https://github.com/viatropos/tower/blob/master/packages/tower-support/shared/array.coffee
   //records = records.sort(function(a, b){
   //  a.id < b.id
   //});
