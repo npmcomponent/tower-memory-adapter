@@ -4,11 +4,9 @@
  */
 
 var adapter = require('tower-adapter')
-  , topology = require('tower-topology')
   , action = require('tower-stream')
   , filter = require('tower-filter')
-  , validate = require('tower-validate')
-  , optimizer = require('tower-query-optimizer');
+  , validate = require('tower-validate');
 
 /**
  * Expose `memory` adapter.
@@ -66,11 +64,34 @@ action('memory.remove', remove);
  */
 
 exports.exec = function(query, fn){
-  var topology = optimizer.topology('memory', query.criteria);
+  var topology = new Topology
+    , criteria = query.criteria
+    , action = criteria[criteria.length - 1][1].type
+    , name
+    , constraint
+    // find/create/update/remove;
 
-  process.nextTick(function(){
-    topology.exec(fn);
-  });
+  for (var i = 0, n = criteria.length; i < n; i++) {
+    constraint = criteria[i];
+    switch (constraint[0]) {
+      case 'select':
+      case 'start':
+        topology.stream(name = 'memory' + '.' + action, { constraints: [], collectionName: constraint[1] });
+        break;
+      case 'constraint':
+        // XXX: shouldn't have to create another array here, tmp for now.
+        topology.streams[name].constraints.push([ constraint[1].attr, constraint[2], constraint[3] ]);
+        break;
+      case 'action':
+        topology.streams[name].data = constraint[1].data;
+        break;
+    }
+  }
+
+  console.log(topology)
+
+  // XXX: process.nextTick
+  topology.exec(fn);
 
   return topology;
 }

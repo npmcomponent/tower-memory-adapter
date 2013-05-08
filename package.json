@@ -2,16 +2,10 @@
   "name": "tower-memory-adapter",
   "version": "0.0.1",
   "dependencies": {
-    "tower-model": "*",
     "tower-adapter": "*",
-    "tower-topology": "*",
     "tower-stream": "*",
     "tower-filter": "*",
-    "tower-validate": "*",
-    "tower-query-optimizer": "*"
-  },
-  "devDependencies": {
-    "tower-query": "*"
+    "tower-validate": "*"
   },
   "main": "./index.js"
 }

@@ -11,13 +11,10 @@
     "tower"
   ],
   "dependencies": {
-    "tower/model": "*",
     "tower/adapter": "*",
-    "tower/topology": "*",
     "tower/stream": "*",
     "tower/filter": "*",
-    "tower/validate": "*",
-    "tower/query-optimizer": "*"
+    "tower/validate": "*"
   },
   "scripts": ["index.js"],
   "license": "MIT"
