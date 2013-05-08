@@ -209,9 +209,14 @@ function find(ctx, data, fn) {
 
   if (constraints.length) {
     records = query.filter(records, constraints)
+  } else {
+    records = records.concat();
   }
 
   // XXX: sort
+  //records = records.sort(function(a, b){
+  //  a.id < b.id
+  //});
 
   // limit
   if (ctx.limit) records.splice(ctx.limit);

@@ -38,4 +38,16 @@ describe('memory-adapter query', function(){
         });
     });
   });
+
+  describe('sort', function(){
+    it('should `sort`', function(done){
+      memory.query()
+        .select('post')
+        .sort('id', -1)
+        .all(function(err, records){
+          console.log(records[0].id);
+          done();
+        });
+    });
+  });
 });
