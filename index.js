@@ -84,6 +84,8 @@ exports.exec = function(query, fn){
         // XXX: shouldn't have to create another array here, tmp for now.
         program.constraints.push(constraint[1]);
         break;
+      case 'limit':
+        program.limit = constraint[1];
       case 'action':
         program.data = constraint[1].data;
         break;
@@ -108,10 +110,20 @@ exports.load = function(key, val){
     for (var _key in key)
       exports.load(_key, key[_key]);
   } else {
-    exports.collection[key] = val;
+    var collection = exports.find(key) || exports.create(key);
+    collection.push.apply(collection, val);
   }
 
   return exports;
+}
+
+/**
+ * Reset everything.
+ */
+
+exports.clear = function(){
+  // XXX: should be more robust.
+  exports.collections = {};
 }
 
 /**
@@ -196,11 +208,15 @@ function find(ctx, data, fn) {
     , constraints = ctx.constraints;
 
   if (constraints.length) {
-    ctx.emit('data', query.filter(records, constraints));
-  } else {
-    // optimized case of no query params
-    ctx.emit('data', records);
+    records = query.filter(records, constraints)
   }
+
+  // XXX: sort
+
+  // limit
+  if (ctx.limit) records.splice(ctx.limit);
+  
+  ctx.emit('data', records);
   
   fn();
 
