@@ -100,6 +100,21 @@ exports.exec = function(query, fn){
 }
 
 /**
+ * Load data.
+ */
+
+exports.load = function(key, val){
+  if ('object' === typeof key) {
+    for (var _key in key)
+      exports.load(_key, key[_key]);
+  } else {
+    exports.collection[key] = val;
+  }
+
+  return exports;
+}
+
+/**
  * Connect.
  *
  * @param {String} name
@@ -200,18 +215,19 @@ function create(ctx, data, fn) {
   records.push.apply(records, ctx.data);
   ctx.emit('data', ctx.data);
   fn();
+  ctx.close();
 }
 
-function update(ctx, data, next) {
-  var records = collection(ctx.collectionName)
-    , data = ctx.data
+function update(ctx, data, fn) {
+  var records = collection(ctx.collectionName.model)
+    , data = ctx.data && ctx.data[0] // XXX: refactor
     , constraints = ctx.constraints;
 
   // XXX: or `isBlank`
   // if (!data)
 
   if (constraints.length)
-    records = filter(records, constraints);
+    records = query.filter(records, constraints);
 
   // XXX: this could be optimized to just iterate once
   //      by reimpl part of `filter` here.
@@ -224,10 +240,12 @@ function update(ctx, data, next) {
   }
 
   ctx.emit('data', records);
+  fn();
+  ctx.close();
 }
 
 function remove(ctx, data, fn) {
-  var records = collection(ctx.collectionName)
+  var records = collection(ctx.collectionName.model)
     , constraints = ctx.constraints;
 
   var result = [];
@@ -236,7 +254,7 @@ function remove(ctx, data, fn) {
     var i = records.length;
 
     while (i--) {
-      if (validate(records[i], constraints)) {
+      if (query.validate(records[i], constraints)) {
         result.unshift(records.splice(i, 1)[0]);
       }
     }

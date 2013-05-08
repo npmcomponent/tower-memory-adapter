@@ -70,7 +70,7 @@ describe('memoryAdapter', function(){
         query()
           .use('memory')
           .start('post')
-          .find(function(records){
+          .find(function(err, records){
             assert(5 === records.length);
             database.post.pop();
             done();
@@ -83,16 +83,14 @@ describe('memoryAdapter', function(){
       .use('memory')
       .start('post')
       .where('title').eq('post three')
-      .update({ title: 'post three!!!' })
-      .on('data', function(records){
+      .update({ title: 'post three!!!' }, function(err, records){
         assert(1 === records.length);
         assert('post three!!!' === records[0].title);
 
         query()
           .use('memory')
           .start('post')
-          .query()
-          .on('data', function(records){
+          .find(function(err, records){
             assert(4 === records.length);
             records[2].title = 'post three';
             done();
@@ -105,15 +103,14 @@ describe('memoryAdapter', function(){
       .use('memory')
       .start('post')
       .where('title').eq('post three')
-      .remove()
-      .on('data', function(records){
+      .remove(function(err, records){
         assert(1 === records.length);
         assert('post three' === records[0].title);
 
         query()
           .use('memory')
           .start('post')
-          .query().on('data', function(currentRecords){
+          .find(function(err, currentRecords){
             assert(3 === currentRecords.length);
             done();
           });
