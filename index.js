@@ -63,39 +63,16 @@ stream('memory.remove', remove);
  */
 
 exports.exec = function(query, fn){
-  var criteria = query.criteria
-    , action = criteria[criteria.length - 1][1].type
-    , name
-    , constraint
-    , program
-    // find/create/update/remove;
-
-  for (var i = 0, n = criteria.length; i < n; i++) {
-    constraint = criteria[i];
-    switch (constraint[0]) {
-      case 'select':
-      case 'start':
-        program = stream(name = 'memory' + '.' + action).create({
-          constraints: [],
-          collectionName: constraint[1]
-        });
-        break;
-      case 'constraint':
-        // XXX: shouldn't have to create another array here, tmp for now.
-        program.constraints.push(constraint[1]);
-        break;
-      case 'limit':
-        program.limit = constraint[1];
-      case 'action':
-        program.data = constraint[1].data;
-        break;
-    }
-  }
+  var program = stream('memory' + '.' + query.type).create({
+    collectionName: query.selects[0],
+    query: query
+  });
 
   // XXX: process.nextTick
   program.on('data', function(records){
     fn(null, records);
   });
+
   program.exec();
 
   return program;
@@ -205,7 +182,7 @@ function collection(name) {
 
 function find(ctx, data, fn) {
   var records = collection(ctx.collectionName.model)
-    , constraints = ctx.constraints;
+    , constraints = ctx.query.constraints;
 
   if (constraints.length) {
     records = query.filter(records, constraints)
@@ -219,7 +196,7 @@ function find(ctx, data, fn) {
   //});
 
   // limit
-  if (ctx.limit) records.splice(ctx.limit);
+  if (ctx.query.paging.limit) records.splice(ctx.query.paging.limit);
   
   ctx.emit('data', records);
   
@@ -230,19 +207,19 @@ function find(ctx, data, fn) {
 
 function create(ctx, data, fn) {
   var records = collection(ctx.collectionName.model)
-    , constraints = ctx.constraints;
+    , constraints = ctx.query.constraints;
 
   // XXX: generate uuid
-  records.push.apply(records, ctx.data);
-  ctx.emit('data', ctx.data);
+  records.push.apply(records, ctx.query.data);
+  ctx.emit('data', ctx.query.data);
   fn();
   ctx.close();
 }
 
 function update(ctx, data, fn) {
   var records = collection(ctx.collectionName.model)
-    , data = ctx.data && ctx.data[0] // XXX: refactor
-    , constraints = ctx.constraints;
+    , data = ctx.query.data && ctx.query.data[0] // XXX: refactor
+    , constraints = ctx.query.constraints;
 
   // XXX: or `isBlank`
   // if (!data)
@@ -267,7 +244,7 @@ function update(ctx, data, fn) {
 
 function remove(ctx, data, fn) {
   var records = collection(ctx.collectionName.model)
-    , constraints = ctx.constraints;
+    , constraints = ctx.query.constraints;
 
   var result = [];
 

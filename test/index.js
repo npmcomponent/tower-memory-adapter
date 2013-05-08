@@ -35,7 +35,7 @@ describe('memoryAdapter', function(){
     var post = new Post({ title: 'foo' });
 
     var criteria = [
-        ['start', 'posts']
+        ['select', 'posts']
       , ['action', 'insert', post]
     ];
 
@@ -48,7 +48,7 @@ describe('memoryAdapter', function(){
   it('should find', function(done){
     query()
       .use('memory')
-      .start('post')
+      .select('post')
       .where('title').eq('post two')
       .where('likeCount').gte(5)
       .find(function(err, records){
@@ -62,14 +62,14 @@ describe('memoryAdapter', function(){
   it('should create', function(done){
     query()
       .use('memory')
-      .start('post')
+      .select('post')
       .create([ { id: 5, title: 'foo' } ], function(err, records){
         assert(1 === records.length);
         assert('foo' === records[0].title);
 
         query()
           .use('memory')
-          .start('post')
+          .select('post')
           .find(function(err, records){
             assert(5 === records.length);
             database.post.pop();
@@ -81,7 +81,7 @@ describe('memoryAdapter', function(){
   it('should update', function(done){
     query()
       .use('memory')
-      .start('post')
+      .select('post')
       .where('title').eq('post three')
       .update({ title: 'post three!!!' }, function(err, records){
         assert(1 === records.length);
@@ -89,7 +89,7 @@ describe('memoryAdapter', function(){
 
         query()
           .use('memory')
-          .start('post')
+          .select('post')
           .find(function(err, records){
             assert(4 === records.length);
             records[2].title = 'post three';
@@ -101,7 +101,7 @@ describe('memoryAdapter', function(){
   it('should remove', function(done){
     query()
       .use('memory')
-      .start('post')
+      .select('post')
       .where('title').eq('post three')
       .remove(function(err, records){
         assert(1 === records.length);
@@ -109,7 +109,7 @@ describe('memoryAdapter', function(){
 
         query()
           .use('memory')
-          .start('post')
+          .select('post')
           .find(function(err, currentRecords){
             assert(3 === currentRecords.length);
             done();
@@ -120,7 +120,7 @@ describe('memoryAdapter', function(){
   /*it('should query multiple collections', function(done){
     // something along these lines, still thinking..
     var criteria = [
-        ['start', 'comments']
+        ['select', 'comments']
       , ['relation', 'outgoing', 'post']
       // or, if length == 6 then collection.property
       , ['constraint', 'eq', 'post.title', 'post two']
