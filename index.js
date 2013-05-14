@@ -127,6 +127,10 @@ exports.disconnect = function(name, fn){
   if (fn) fn();
 }
 
+exports.collection = function(name){
+  return exports.find(key) || exports.create(key);
+}
+
 /**
  * Create a database/collection/index.
  *
