@@ -128,7 +128,7 @@ exports.disconnect = function(name, fn){
 }
 
 exports.collection = function(name){
-  return exports.find(key) || exports.create(key);
+  return exports.find(name) || exports.create(name);
 }
 
 /**
