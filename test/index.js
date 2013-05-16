@@ -63,9 +63,10 @@ describe('memoryAdapter', function(){
     query()
       .use('memory')
       .select('post')
-      .create([ { id: 5, title: 'foo' } ], function(err, records){
+      .create({ id: 5, title: 'foo' }, function(err, records){
         assert(1 === records.length);
         assert('foo' === records[0].title);
+        assert(5 === records[0].__id__);
 
         query()
           .use('memory')
@@ -112,6 +113,28 @@ describe('memoryAdapter', function(){
           .select('post')
           .find(function(err, currentRecords){
             assert(3 === currentRecords.length);
+            done();
+          });
+      });
+  });
+
+  it('should generate an `__id__` for a record if no `id`', function(done){
+    query()
+      .use('memory')
+      .select('post')
+      .create({ title: 'foo' }, function(err, records){
+        var created = records[0];
+        assert(36 === created.__id__.length);
+
+        query()
+          .use('memory')
+          .select('post')
+          //.where('id').eq(created.__id__)
+          .find(function(err, records){
+            var found = records.pop();
+            console.log(found)
+            //assert(5 === records.length);
+            database.post.pop();
             done();
           });
       });

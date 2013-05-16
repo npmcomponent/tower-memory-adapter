@@ -5,7 +5,8 @@
 
 var adapter = require('tower-adapter')
   , stream = require('tower-stream')
-  , query = require('tower-query');
+  , query = require('tower-query')
+  , uuid = require('tower-uuid');
 
 /**
  * Expose `memory` adapter.
@@ -88,7 +89,9 @@ exports.load = function(key, val){
       exports.load(_key, key[_key]);
   } else {
     var collection = exports.find(key) || exports.create(key);
-    collection.push.apply(collection, val);
+    for (var i = 0, n = val.length; i < n; i++) {
+      collection.push(identify(val[i]))
+    }
   }
 
   return exports;
@@ -214,8 +217,10 @@ function create(ctx, data, fn) {
   var records = collection(ctx.collectionName.model)
     , constraints = ctx.query.constraints;
 
-  // XXX: generate uuid
-  records.push.apply(records, ctx.query.data);
+  for (var i = 0, n = ctx.query.data.length; i < n; i++) {
+    records.push(identify(ctx.query.data[i]));
+  }
+
   ctx.emit('data', ctx.query.data);
   fn();
   ctx.close();
@@ -265,4 +270,19 @@ function remove(ctx, data, fn) {
 
   ctx.emit('data', result);
   fn();
+}
+
+/**
+ * Create a hidden `__id__` on `record`,
+ * so it can be stored in memory by id.
+ */
+
+function identify(record) {
+  // XXX: refactor. maybe adapters allow raw objects (not models)
+  // used for storing in memory on the client.
+  if (null == record.__id__) {
+    record.__id__ = (record.get ? record.get('id') : record.id) || uuid();
+  }
+
+  return record;
 }
