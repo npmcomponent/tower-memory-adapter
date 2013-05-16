@@ -4,6 +4,7 @@
  */
 
 var adapter = require('tower-adapter')
+  , model = require('tower-model')
   , stream = require('tower-stream')
   , query = require('tower-query')
   , uuid = require('tower-uuid');
@@ -83,14 +84,14 @@ exports.exec = function(query, fn){
  * Load data.
  */
 
-exports.load = function(key, val){
-  if ('object' === typeof key) {
-    for (var _key in key)
-      exports.load(_key, key[_key]);
+exports.load = function(name, val){
+  if ('object' === typeof name) {
+    for (var key in name)
+      exports.load(key, name[key]);
   } else {
-    var collection = exports.find(key) || exports.create(key);
+    var collection = exports.find(name) || exports.create(name);
     for (var i = 0, n = val.length; i < n; i++) {
-      collection.push(identify(val[i]))
+      collection.push(identify(val[i], name))
     }
   }
 
@@ -214,11 +215,12 @@ function find(ctx, data, fn) {
 }
 
 function create(ctx, data, fn) {
-  var records = collection(ctx.collectionName.model)
+  var name = ctx.collectionName.model;
+  var records = collection(name)
     , constraints = ctx.query.constraints;
 
   for (var i = 0, n = ctx.query.data.length; i < n; i++) {
-    records.push(identify(ctx.query.data[i]));
+    records.push(ctx.query.data[i] = identify(ctx.query.data[i], name));
   }
 
   ctx.emit('data', ctx.query.data);
@@ -277,9 +279,12 @@ function remove(ctx, data, fn) {
  * so it can be stored in memory by id.
  */
 
-function identify(record) {
+function identify(record, name) {
   // XXX: refactor. maybe adapters allow raw objects (not models)
   // used for storing in memory on the client.
+  if (!model.is(record))
+    record = model(name).init(record);
+
   if (null == record.__id__) {
     record.__id__ = (record.get ? record.get('id') : record.id) || uuid();
   }

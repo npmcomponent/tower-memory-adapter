@@ -65,8 +65,8 @@ describe('memoryAdapter', function(){
       .select('post')
       .create({ id: 5, title: 'foo' }, function(err, records){
         assert(1 === records.length);
-        assert('foo' === records[0].title);
-        assert(5 === records[0].__id__);
+        assert('foo' === records[0].get('title'));
+        assert(5 === records[0].get('id'));
 
         query()
           .use('memory')
@@ -129,10 +129,9 @@ describe('memoryAdapter', function(){
         query()
           .use('memory')
           .select('post')
-          //.where('id').eq(created.__id__)
+          .where('id').eq(created.__id__)
           .find(function(err, records){
             var found = records.pop();
-            console.log(found)
             //assert(5 === records.length);
             database.post.pop();
             done();

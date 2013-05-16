@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "tower-adapter": "*",
+    "tower-model": "*",
     "tower-stream": "*",
     "tower-query": "*",
     "tower-uuid": "*"

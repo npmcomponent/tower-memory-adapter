@@ -33,7 +33,7 @@ describe('memory-adapter query', function(){
         .limit(2)
         .all(function(err, records){
           assert(2 === records.length);
-          assert(1 === records[0].id)
+          assert(1 === records[0].get('id'))
           done();
         });
     });
