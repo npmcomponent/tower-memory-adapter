@@ -246,7 +246,8 @@ function update(ctx, data, fn) {
   // remove/modify items while iterating.
   for (var i = 0, n = records.length; i < n; i++) {
     // XXX: `merge` part?
-    for (var key in data) records[i][key] = data[key];
+    // for (var key in data) records[i][key] = data[key];
+    for (var key in data) records[i].set(key, data[key]);
   }
 
   ctx.emit('data', records);

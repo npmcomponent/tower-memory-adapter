@@ -4,32 +4,34 @@ var query = require('tower-query')
   , adapter = require('tower-adapter')
   , assert = require('assert');
 
-var database = {
-  post: [
-      { id: 1, title: 'post one', likeCount: 20 }
-    , { id: 2, title: 'post two', likeCount: 15 }
-    , { id: 3, title: 'post three', likeCount: 3 }
-    , { id: 4, title: 'post two', likeCount: 5 }
-  ],
-
-  comment: [
-      { id: 10, message: 'comment one', userId: 100, embeddedIn: 'post' } // embedded
-    , { id: 10, message: 'comment one', userId: 101, postId: 2 } // referenced
-  ],
-
-  user: [
-      { id: 100, email: 'user100@email.com' }
-    , { id: 101, email: 'user101@email.com' }
-  ]
-}
-
-adapter('memory').collections = database;
+var Post = model('post')
+  .attr('title', { type: 'string' })
+  .attr('likeCount', { type: 'number' });
 
 describe('memoryAdapter', function(){
-  var Post = model('post')
-    .attr('title', { type: 'string' })
-    .attr('likeCount', { type: 'number' });
+  beforeEach(function(){
+    memory.clear();
+    var database = {
+      post: [
+          { id: 1, title: 'post one', likeCount: 20 }
+        , { id: 2, title: 'post two', likeCount: 15 }
+        , { id: 3, title: 'post three', likeCount: 3 }
+        , { id: 4, title: 'post two', likeCount: 5 }
+      ],
 
+      comment: [
+          { id: 10, message: 'comment one', userId: 100, embeddedIn: 'post' } // embedded
+        , { id: 10, message: 'comment one', userId: 101, postId: 2 } // referenced
+      ],
+
+      user: [
+          { id: 100, email: 'user100@email.com' }
+        , { id: 101, email: 'user101@email.com' }
+      ]
+    }
+
+    memory.load(database);
+  });
   /*
   it('should execute criteria', function(done){
     var post = new Post({ title: 'foo' });
@@ -53,8 +55,8 @@ describe('memoryAdapter', function(){
       .where('likeCount').gte(5)
       .find(function(err, records){
         assert.equal(2, records.length);
-        assert.equal('post two', records[0].title);
-        assert.equal('post two', records[1].title);
+        assert.equal('post two', records[0].get('title'));
+        assert.equal('post two', records[1].get('title'));
         done();
       });
   });
@@ -73,7 +75,6 @@ describe('memoryAdapter', function(){
           .select('post')
           .find(function(err, records){
             assert(5 === records.length);
-            database.post.pop();
             done();
           });
       });
@@ -86,14 +87,14 @@ describe('memoryAdapter', function(){
       .where('title').eq('post three')
       .update({ title: 'post three!!!' }, function(err, records){
         assert(1 === records.length);
-        assert('post three!!!' === records[0].title);
+        assert('post three!!!' === records[0].get('title'));
 
         query()
           .use('memory')
           .select('post')
           .find(function(err, records){
             assert(4 === records.length);
-            records[2].title = 'post three';
+            records[2].set('title', 'post three');
             done();
           });
       });
@@ -106,7 +107,7 @@ describe('memoryAdapter', function(){
       .where('title').eq('post three')
       .remove(function(err, records){
         assert(1 === records.length);
-        assert('post three' === records[0].title);
+        assert('post three' === records[0].get('title'));
 
         query()
           .use('memory')
@@ -133,7 +134,6 @@ describe('memoryAdapter', function(){
           .find(function(err, records){
             var found = records.pop();
             //assert(5 === records.length);
-            database.post.pop();
             done();
           });
       });
