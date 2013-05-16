@@ -3,7 +3,7 @@ var memory = require('..')
   , assert = require('assert');
 
 describe('memory-adapter query', function(){
-  before(function(){
+  beforeEach(function(){
     memory.clear();
     memory.load({
       post: [
@@ -47,6 +47,19 @@ describe('memory-adapter query', function(){
         .all(function(err, records){
           done();
         });
+    });
+  });
+
+  it('should remove by `id`', function(){
+    memory.query().select('post').all(function(err, records){
+      assert(4 === records.length);
+
+      var second = records[1];
+      second.remove(function(){
+        memory.query().select('post').all(function(err, records){
+          assert(3 === records.length);
+        });
+      });
     });
   });
 });

@@ -260,7 +260,7 @@ function remove(ctx, data, fn) {
 
   var result = [];
 
-  if (constraints) {
+  if (constraints.length) {
     var i = records.length;
 
     while (i--) {
