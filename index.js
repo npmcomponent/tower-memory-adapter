@@ -3,11 +3,11 @@
  * Module dependencies.
  */
 
-var adapter = require('tower-adapter')
-  , model = require('tower-model')
-  , stream = require('tower-stream')
-  , query = require('tower-query')
-  , uuid = require('tower-uuid');
+var adapter = require('tower-adapter');
+var model = require('tower-model');
+var stream = require('tower-stream');
+var query = require('tower-query');
+var uuid = require('tower-uuid');
 
 /**
  * Expose `memory` adapter.
@@ -78,7 +78,7 @@ exports.exec = function(query, fn){
   program.exec();
 
   return program;
-}
+};
 
 /**
  * Load data.
@@ -96,7 +96,7 @@ exports.load = function(name, val){
   }
 
   return exports;
-}
+};
 
 /**
  * Reset everything.
@@ -105,35 +105,11 @@ exports.load = function(name, val){
 exports.clear = function(){
   // XXX: should be more robust.
   exports.collections = {};
-}
-
-/**
- * Connect.
- *
- * @param {String} name
- * @param {Function} fn
- * @api public
- */
-
-exports.connect = function(name, fn){
-  if (fn) fn();
-}
-
-/**
- * Disconnect.
- *
- * @param {String} name
- * @param {Function} fn
- * @api public
- */
-
-exports.disconnect = function(name, fn){
-  if (fn) fn();
-}
+};
 
 exports.collection = function(name){
   return exports.find(name) || exports.create(name);
-}
+};
 
 /**
  * Create a database/collection/index.
@@ -145,7 +121,7 @@ exports.collection = function(name){
 
 exports.create = function(name, fn){
   return exports.collections[name] = [];
-}
+};
 
 /**
  * Update a database/collection/index.
@@ -157,7 +133,7 @@ exports.create = function(name, fn){
 
 exports.update = function(name, fn){
 
-}
+};
 
 /**
  * Remove a database/collection/index.
@@ -170,7 +146,7 @@ exports.update = function(name, fn){
 exports.remove = function(name, fn){
   delete exports.collections[name];
   return exports;
-}
+};
 
 /**
  * Find a database/collection/index.
@@ -182,7 +158,7 @@ exports.remove = function(name, fn){
 
 exports.find = function(name, fn){
   return exports.collections[name];
-}
+};
 
 function collection(name) {
   return exports.collections[name] || (exports.collections[name] = []);
