@@ -1,6 +1,6 @@
 var memory = require('..')
-  , model = require('tower-model')
-  , assert = require('assert');
+var resource = require('tower-resource')
+var assert = require('assert');
 
 describe('memory-adapter query', function(){
   beforeEach(function(){

@@ -1,10 +1,10 @@
-var query = require('tower-query')
-  , model = require('tower-model')
-  , memory = require('..')
-  , adapter = require('tower-adapter')
-  , assert = require('assert');
+var query = require('tower-query');
+var resource = require('tower-resource');
+var memory = require('..');
+var adapter = require('tower-adapter');
+var assert = require('assert');
 
-var Post = model('post')
+var Post = resource('post')
   .attr('title', { type: 'string' })
   .attr('likeCount', { type: 'number' });
 

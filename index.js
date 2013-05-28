@@ -4,7 +4,7 @@
  */
 
 var adapter = require('tower-adapter');
-var model = require('tower-model');
+var resource = require('tower-resource');
 var stream = require('tower-stream');
 var query = require('tower-query');
 var uuid = require('tower-uuid');
@@ -165,7 +165,7 @@ function collection(name) {
 }
 
 function find(ctx, data, fn) {
-  var records = collection(ctx.collectionName.model)
+  var records = collection(ctx.collectionName.resource)
     , constraints = ctx.query.constraints;
 
   if (constraints.length) {
@@ -191,7 +191,7 @@ function find(ctx, data, fn) {
 }
 
 function create(ctx, data, fn) {
-  var name = ctx.collectionName.model;
+  var name = ctx.collectionName.resource;
   var records = collection(name)
     , constraints = ctx.query.constraints;
 
@@ -205,7 +205,7 @@ function create(ctx, data, fn) {
 }
 
 function update(ctx, data, fn) {
-  var records = collection(ctx.collectionName.model)
+  var records = collection(ctx.collectionName.resource)
     , data = ctx.query.data && ctx.query.data[0] // XXX: refactor
     , constraints = ctx.query.constraints;
 
@@ -232,7 +232,7 @@ function update(ctx, data, fn) {
 }
 
 function remove(ctx, data, fn) {
-  var records = collection(ctx.collectionName.model)
+  var records = collection(ctx.collectionName.resource)
     , constraints = ctx.query.constraints;
 
   var result = [];
@@ -257,10 +257,10 @@ function remove(ctx, data, fn) {
  */
 
 function identify(record, name) {
-  // XXX: refactor. maybe adapters allow raw objects (not models)
+  // XXX: refactor. maybe adapters allow raw objects (not resources)
   // used for storing in memory on the client.
-  if (!model.is(record))
-    record = model(name).init(record);
+  if (!resource.is(record))
+    record = resource(name).init(record);
 
   if (null == record.__id__) {
     record.__id__ = (record.get ? record.get('id') : record.id) || uuid();

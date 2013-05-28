@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "tower/adapter": "*",
-    "tower/model": "*",
+    "tower/resource": "*",
     "tower/stream": "*",
     "tower/query": "*",
     "tower/uuid": "*"
