@@ -5,14 +5,12 @@ var assert = require('assert');
 describe('memory-adapter query', function(){
   beforeEach(function(){
     memory.clear();
-    memory.load({
-      post: [
-          { id: 1, title: 'post one', likeCount: 20 }
-        , { id: 2, title: 'post two', likeCount: 15 }
-        , { id: 3, title: 'post three', likeCount: 3 }
-        , { id: 4, title: 'post two', likeCount: 5 }
-      ]
-    });
+    memory.load('post', [
+      { id: 1, title: 'post one', likeCount: 20 },
+      { id: 2, title: 'post two', likeCount: 15 },
+      { id: 3, title: 'post three', likeCount: 3 },
+      { id: 4, title: 'post two', likeCount: 5 }
+    ]);
   });
 
   describe('select', function(){
