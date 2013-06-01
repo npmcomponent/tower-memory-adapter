@@ -17,6 +17,10 @@
     "tower/query": "*",
     "tower/uuid": "*"
   },
+  "development": {
+    "timoxley/assert": "*",
+    "visionmedia/mocha": "*"
+  },
   "scripts": ["index.js"],
   "license": "MIT"
 }

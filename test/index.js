@@ -1,8 +1,15 @@
+
+if ('undefined' === typeof window) {
+  var memory = require('..');
+  var assert = require('assert');
+} else {
+  var memory = require('tower-memory-adapter');
+  var assert = require('timoxley-assert');
+}
+
 var query = require('tower-query');
 var resource = require('tower-resource');
-var memory = require('..');
 var adapter = require('tower-adapter');
-var assert = require('assert');
 
 var Post = resource('post')
   .attr('title', { type: 'string' })
