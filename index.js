@@ -165,8 +165,8 @@ function collection(name) {
 }
 
 function find(ctx, data, fn) {
-  var records = collection(ctx.collectionName.resource)
-    , constraints = ctx.query.constraints;
+  var records = collection(ctx.collectionName.resource);
+  var constraints = ctx.query.constraints;
 
   if (constraints.length) {
     records = query.filter(records, constraints)
@@ -192,8 +192,8 @@ function find(ctx, data, fn) {
 
 function create(ctx, data, fn) {
   var name = ctx.collectionName.resource;
-  var records = collection(name)
-    , constraints = ctx.query.constraints;
+  var records = collection(name);
+  var constraints = ctx.query.constraints;
 
   for (var i = 0, n = ctx.query.data.length; i < n; i++) {
     records.push(ctx.query.data[i] = identify(ctx.query.data[i], name));
@@ -205,15 +205,16 @@ function create(ctx, data, fn) {
 }
 
 function update(ctx, data, fn) {
-  var records = collection(ctx.collectionName.resource)
-    , data = ctx.query.data && ctx.query.data[0] // XXX: refactor
-    , constraints = ctx.query.constraints;
+  var records = collection(ctx.collectionName.resource);
+  var data = ctx.query.data && ctx.query.data[0]; // XXX: refactor
+  var constraints = ctx.query.constraints;
 
   // XXX: or `isBlank`
   // if (!data)
 
-  if (constraints.length)
+  if (constraints.length) {
     records = query.filter(records, constraints);
+  }
 
   // XXX: this could be optimized to just iterate once
   //      by reimpl part of `filter` here.
@@ -232,9 +233,8 @@ function update(ctx, data, fn) {
 }
 
 function remove(ctx, data, fn) {
-  var records = collection(ctx.collectionName.resource)
-    , constraints = ctx.query.constraints;
-
+  var records = collection(ctx.collectionName.resource);
+  var constraints = ctx.query.constraints;
   var result = [];
 
   if (constraints.length) {
@@ -259,8 +259,9 @@ function remove(ctx, data, fn) {
 function identify(record, name) {
   // XXX: refactor. maybe adapters allow raw objects (not resources)
   // used for storing in memory on the client.
-  if (!resource.is(record))
-    record = resource(name).init(record);
+  if (!resource.is(record)) {
+    record = resource(name).init(record); 
+  }
 
   if (null == record.__id__) {
     record.__id__ = (record.get ? record.get('id') : record.id) || uuid();
