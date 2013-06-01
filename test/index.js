@@ -35,7 +35,7 @@ describe('memoryAdapter', function(){
         { id: 100, email: 'user100@email.com' },
         { id: 101, email: 'user101@email.com' }
       ]
-    }
+    };
 
     memory.load(database);
   });
