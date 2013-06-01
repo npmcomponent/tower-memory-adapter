@@ -20,20 +20,20 @@ describe('memoryAdapter', function(){
     memory.clear();
     var database = {
       post: [
-          { id: 1, title: 'post one', likeCount: 20 }
-        , { id: 2, title: 'post two', likeCount: 15 }
-        , { id: 3, title: 'post three', likeCount: 3 }
-        , { id: 4, title: 'post two', likeCount: 5 }
+        { id: 1, title: 'post one', likeCount: 20 },
+        { id: 2, title: 'post two', likeCount: 15 },
+        { id: 3, title: 'post three', likeCount: 3 },
+        { id: 4, title: 'post two', likeCount: 5 }
       ],
 
       comment: [
-          { id: 10, message: 'comment one', userId: 100, embeddedIn: 'post' } // embedded
-        , { id: 10, message: 'comment one', userId: 101, postId: 2 } // referenced
+        { id: 10, message: 'comment one', userId: 100, embeddedIn: 'post' }, // embedded
+        { id: 10, message: 'comment one', userId: 101, postId: 2 } // referenced
       ],
 
       user: [
-          { id: 100, email: 'user100@email.com' }
-        , { id: 101, email: 'user101@email.com' }
+        { id: 100, email: 'user100@email.com' },
+        { id: 101, email: 'user101@email.com' }
       ]
     }
 
