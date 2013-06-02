@@ -2,7 +2,7 @@
   "name": "tower-memory-adapter",
   "repo": "tower/memory-adapter",
   "description": "Tower Memory Adapter component",
-  "version": "0.5.0pre",
+  "version": "0.1.0pre",
   "keywords": [
     "data",
     "datastore",
