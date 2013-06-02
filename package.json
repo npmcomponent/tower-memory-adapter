@@ -1,12 +1,12 @@
 {
   "name": "tower-memory-adapter",
-  "version": "0.0.1",
+  "version": "0.5.0pre",
   "dependencies": {
-    "tower-adapter": "*",
-    "tower-resource": "*",
-    "tower-stream": "*",
-    "tower-query": "*",
-    "tower-uuid": "*"
+    "tower-adapter": "~0.5.0pre",
+    "tower-resource": "~0.5.0pre",
+    "tower-stream": "~0.5.0pre",
+    "tower-query": "~0.5.0pre",
+    "tower-uuid": "~0.5.0pre"
   },
   "main": "./index.js"
 }
