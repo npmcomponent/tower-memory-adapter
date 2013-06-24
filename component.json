@@ -2,7 +2,7 @@
   "name": "tower-memory-adapter",
   "repo": "tower/memory-adapter",
   "description": "Tower Memory Adapter component",
-  "version": "0.1.0pre",
+  "version": "0.1.0",
   "keywords": [
     "data",
     "datastore",
@@ -11,11 +11,11 @@
     "tower"
   ],
   "dependencies": {
-    "tower/adapter": "*",
-    "tower/resource": "*",
-    "tower/stream": "*",
-    "tower/query": "*",
-    "tower/uuid": "*"
+    "tower/adapter": "0.1.0",
+    "tower/resource": "0.1.0",
+    "tower/stream": "0.1.0",
+    "tower/query": "0.1.0",
+    "tower/uuid": "0.1.0"
   },
   "development": {
     "timoxley/assert": "*",

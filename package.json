@@ -1,12 +1,17 @@
 {
   "name": "tower-memory-adapter",
-  "version": "0.1.0pre",
+  "version": "0.1.0",
+  "keywords": ["orm", "mvc", "tower"],
   "dependencies": {
-    "tower-adapter": "~0.1.0pre",
-    "tower-resource": "~0.1.0pre",
-    "tower-stream": "~0.1.0pre",
-    "tower-query": "~0.1.0pre",
-    "tower-uuid": "~0.1.0pre"
+    "tower-adapter": "~0.1.0",
+    "tower-resource": "~0.1.0",
+    "tower-stream": "~0.1.0",
+    "tower-query": "~0.1.0",
+    "tower-uuid": "~0.1.0"
   },
-  "main": "./index.js"
+  "main": "./index.js",
+  "repository": {
+    "type" : "git",
+    "url" : "http://github.com/tower/memory-adapter.git"
+  }
 }
