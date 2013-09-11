@@ -8,6 +8,7 @@ var resource = require('tower-resource');
 var stream = require('tower-stream');
 var query = require('tower-query');
 var uuid = require('tower-uuid');
+var indexOf = require('indexof');
 
 /**
  * Expose `memory` adapter.
@@ -40,7 +41,7 @@ exports
  * Find records.
  */
 
-stream('memory.find', find);
+stream('memory.select', select);
 
 /**
  * Create records.
@@ -66,7 +67,7 @@ stream('memory.remove', remove);
 
 exports.exec = function(query, fn){
   var program = stream('memory' + '.' + query.type).create({
-    collectionName: query.selects[0],
+    collectionName: query.resources[0],
     query: query
   });
 
@@ -89,7 +90,7 @@ exports.load = function(name, val){
     for (var key in name)
       exports.load(key, name[key]);
   } else {
-    var collection = exports.find(name) || exports.create(name);
+    var collection = exports.select(name) || exports.create(name);
     for (var i = 0, n = val.length; i < n; i++) {
       collection.push(identify(val[i], name))
     }
@@ -108,7 +109,7 @@ exports.clear = function(){
 };
 
 exports.collection = function(name){
-  return exports.find(name) || exports.create(name);
+  return exports.select(name) || exports.create(name);
 };
 
 /**
@@ -156,7 +157,7 @@ exports.remove = function(name, fn){
  * @api public
  */
 
-exports.find = function(name, fn){
+exports.select = function(name, fn){
   return exports.collections[name];
 };
 
@@ -164,7 +165,7 @@ function collection(name) {
   return exports.collections[name] || (exports.collections[name] = []);
 }
 
-function find(ctx, data, fn) {
+function select(ctx, data, fn) {
   var records = collection(ctx.collectionName.resource);
   var constraints = ctx.query.constraints;
 
@@ -224,7 +225,7 @@ function update(ctx, data, fn) {
   for (var i = 0, n = records.length; i < n; i++) {
     // XXX: `merge` part?
     // for (var key in data) records[i][key] = data[key];
-    for (var key in data) records[i].set(key, data[key]);
+    for (var key in data) records[i][key] = data[key];
   }
 
   ctx.emit('data', records);
@@ -245,6 +246,12 @@ function remove(ctx, data, fn) {
         result.unshift(records.splice(i, 1)[0]);
       }
     }
+  } else if (ctx.query.data) {
+    var index;
+    for (var i = 0, n = ctx.query.data.length; i < n; i++) {
+      index = indexOf(records, ctx.query.data[i]);
+      if (index != -1) result.push(records.splice(index, 1)[0]);
+    }
   }
 
   ctx.emit('data', result);
@@ -257,12 +264,6 @@ function remove(ctx, data, fn) {
  */
 
 function identify(record, name) {
-  // XXX: refactor. maybe adapters allow raw objects (not resources)
-  // used for storing in memory on the client.
-  if (!resource.is(record)) {
-    record = resource(name).init(record); 
-  }
-
   if (null == record.__id__) {
     record.__id__ = (record.get ? record.get('id') : record.id) || uuid();
   }

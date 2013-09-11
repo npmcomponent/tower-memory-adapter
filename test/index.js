@@ -54,16 +54,16 @@ describe('memoryAdapter', function(){
   });
   */
 
-  it('should find', function(done){
+  it('should select', function(done){
     query()
       .use('memory')
-      .select('post')
+      .resource('post')
       .where('title').eq('post two')
       .where('likeCount').gte(5)
-      .find(function(err, records){
+      .select(function(err, records){
         assert.equal(2, records.length);
-        assert.equal('post two', records[0].get('title'));
-        assert.equal('post two', records[1].get('title'));
+        assert.equal('post two', records[0].title);
+        assert.equal('post two', records[1].title);
         done();
       });
   });
@@ -71,16 +71,16 @@ describe('memoryAdapter', function(){
   it('should create', function(done){
     query()
       .use('memory')
-      .select('post')
+      .resource('post')
       .create({ id: 5, title: 'foo' }, function(err, records){
         assert(1 === records.length);
-        assert('foo' === records[0].get('title'));
-        assert(5 === records[0].get('id'));
+        assert('foo' === records[0].title);
+        assert(5 === records[0].__id__);
 
         query()
           .use('memory')
-          .select('post')
-          .find(function(err, records){
+          .resource('post')
+          .select(function(err, records){
             assert(5 === records.length);
             done();
           });
@@ -90,18 +90,18 @@ describe('memoryAdapter', function(){
   it('should update', function(done){
     query()
       .use('memory')
-      .select('post')
+      .resource('post')
       .where('title').eq('post three')
       .update({ title: 'post three!!!' }, function(err, records){
         assert(1 === records.length);
-        assert('post three!!!' === records[0].get('title'));
+        assert('post three!!!' === records[0].title);
 
         query()
           .use('memory')
-          .select('post')
-          .find(function(err, records){
+          .resource('post')
+          .select(function(err, records){
             assert(4 === records.length);
-            records[2].set('title', 'post three');
+            records[2].title = 'post three';
             done();
           });
       });
@@ -110,16 +110,16 @@ describe('memoryAdapter', function(){
   it('should remove', function(done){
     query()
       .use('memory')
-      .select('post')
+      .resource('post')
       .where('title').eq('post three')
       .remove(function(err, records){
         assert(1 === records.length);
-        assert('post three' === records[0].get('title'));
+        assert('post three' === records[0].title);
 
         query()
           .use('memory')
-          .select('post')
-          .find(function(err, currentRecords){
+          .resource('post')
+          .select(function(err, currentRecords){
             assert(3 === currentRecords.length);
             done();
           });
@@ -129,16 +129,16 @@ describe('memoryAdapter', function(){
   it('should generate an `__id__` for a record if no `id`', function(done){
     query()
       .use('memory')
-      .select('post')
+      .resource('post')
       .create({ title: 'foo' }, function(err, records){
         var created = records[0];
         assert(36 === created.__id__.length);
 
         query()
           .use('memory')
-          .select('post')
+          .resource('post')
           .where('id').eq(created.__id__)
-          .find(function(err, records){
+          .select(function(err, records){
             var found = records.pop();
             //assert(5 === records.length);
             done();

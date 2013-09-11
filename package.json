@@ -7,7 +7,8 @@
     "tower-resource": "~0.1.0",
     "tower-stream": "~0.1.0",
     "tower-query": "~0.1.0",
-    "tower-uuid": "~0.1.0"
+    "tower-uuid": "~0.1.0",
+    "indexof": "*"
   },
   "main": "./index.js",
   "repository": {
