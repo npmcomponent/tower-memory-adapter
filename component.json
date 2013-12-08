@@ -15,7 +15,8 @@
     "tower/resource": "0.1.1",
     "tower/stream": "0.1.1",
     "tower/query": "0.1.1",
-    "tower/uuid": "0.1.0"
+    "tower/uuid": "0.1.0",
+    "component/indexof": "*"
   },
   "development": {
     "timoxley/assert": "*",
@@ -24,5 +25,6 @@
   "scripts": [
     "index.js"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "remotes": []
 }
