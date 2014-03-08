@@ -55,6 +55,7 @@ describe('memoryAdapter', function(){
   */
 
   it('should select', function(done){
+
     query()
       .use('memory')
       .resource('post')

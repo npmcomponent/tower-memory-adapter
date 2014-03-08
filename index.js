@@ -66,6 +66,7 @@ stream('memory.remove', remove);
  */
 
 exports.exec = function(query, fn){
+  if (!query) throw new Error("Invalid query");
   var program = stream('memory' + '.' + query.type).create({
     collectionName: query.resources[0],
     query: query
