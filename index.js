@@ -3,12 +3,12 @@
  * Module dependencies.
  */
 
-var adapter = require('tower-adapter');
-var resource = require('tower-resource');
-var stream = require('tower-stream');
-var query = require('tower-query');
-var uuid = require('tower-uuid');
-var indexOf = require('indexof');
+// commented out by npm-component: var adapter = require('tower-adapter');
+// commented out by npm-component: var resource = require('tower-resource');
+// commented out by npm-component: var stream = require('tower-stream');
+// commented out by npm-component: var query = require('tower-query');
+// commented out by npm-component: var uuid = require('tower-uuid');
+var indexOf = require('component-indexof');
 
 /**
  * Expose `memory` adapter.

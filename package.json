@@ -1,18 +1,21 @@
 {
   "name": "tower-memory-adapter",
-  "version": "0.1.0",
-  "keywords": ["orm", "mvc", "tower"],
+  "description": "Tower Memory Adapter component",
+  "version": "0.1.1",
+  "keywords": [
+    "data",
+    "datastore",
+    "database",
+    "mvc",
+    "tower"
+  ],
   "dependencies": {
-    "tower-adapter": "~0.1.0",
-    "tower-resource": "~0.1.0",
-    "tower-stream": "~0.1.0",
-    "tower-query": "~0.1.0",
-    "tower-uuid": "~0.1.0",
-    "indexof": "*"
+    "tower-adapter": "git://github.com/npmcomponent/tower-adapter.git",
+    "tower-resource": "git://github.com/npmcomponent/tower-resource.git",
+    "tower-stream": "git://github.com/npmcomponent/tower-stream.git",
+    "tower-query": "git://github.com/npmcomponent/tower-query.git",
+    "tower-uuid": "git://github.com/npmcomponent/tower-uuid.git",
+    "component-indexof": "git://github.com/npmcomponent/component-indexof.git"
   },
-  "main": "./index.js",
-  "repository": {
-    "type" : "git",
-    "url" : "http://github.com/tower/memory-adapter.git"
-  }
+  "license": "MIT"
 }
